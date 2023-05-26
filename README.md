@@ -13,11 +13,11 @@ Aby przekształcić problem selekcjonowania łańcuchów DNA na problem znalezie
 ### Przykład
 Rozważamy zbiór $S = \{ACT, GTA, ACG, CTA, CGT, TAC, ACT\}$ słów o jednakowej długości $l=3$ nad alfabetem $\{A, C, G, T\}$ oraz długość sekwencji $n=8$. Poniżej przedstawiliśmy graf $G$ dla tego zbioru, w którym każdy wierzchołek odpowiada jednemu słowu w zbiorze.
 
-![Graf G bez krawędzi](figures/graf1.png)
+![Graf G bez krawędzi](figures/graf1.PNG)
 
 Następnie tworzymy krawędzie między wierzchołkami. Tworzymy krawędzie o koszcie $i=1$, łącząc każdy wierzchołek z jego następnikiem, jeśli ostatnie 2 litery pierwszego elementu są takie same jak 2 pierwsze litery drugiego elementu. Następnie tworzymy krawędzie o koszcie $i=2$, łącząc każdy wierzchołek, jeśli ostatnia litera pierwszego elementu pokrywa się z pierwszą literą drugiego elementu. Wreszcie tworzymy krawędzie o koszcie $i=3$, łącząc wierzchołki, jeśli są one takie same. Poniżej przedstawiamy graf z wyznaczonymi krawędziami.
 
-![Graf G z krawędziami o koszcie $i=1$](figures/graf2.png)
+![Graf G z krawędziami o koszcie $i=1$](figures/graf2.PNG)
 ![Graf G z krawędziami o koszcie $i=2$](figures/graf3.png)
 
 ## Wykorzystanie algorytmu  najbliższego sąsiada do rozwiązania problemu
