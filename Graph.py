@@ -46,8 +46,49 @@ class Graph:
                     if vertex_label_1[-k:] == vertex_label_2[:k]:
                         self.incident_list[vertex_list[i]].append((vertex_list[j], len(vertex_label_1)-k))
 
+    def shortest_cycle_path(self):
+        import random
+        n = len(self.incident_list)
+        visited = []
+        best_path = []
+
+        def dfs(current, length, path):
+            nonlocal best_path
+
+            visited.append(current)
+            path.append(current)
+
+            if len(path) == n:
+                # jeśli odwiedziliśmy wszystkie wierzchołki, to dodajemy koszt podróży powrotnej do kosztu
+                length += self.incident_list[current][0][1]
+                best_path = path.copy()
+
+            elif not best_path:
+                min_cost = float("inf")
+                min_neighbor = None
+                for neighbor, cost in self.incident_list[current]:
+                    if neighbor not in visited and cost < min_cost:
+                        min_cost = cost
+                        min_neighbor = neighbor
+                if min_neighbor:
+                    dfs(min_neighbor, length + min_cost, path)
+
+            visited.remove(current)
+            path.pop()
+
+        while best_path is None or best_path == []:
+            start = random.choice(list(self.incident_list.keys()))
+            dfs(start, 0, [])
+        return best_path
+
 
 # Expected output: ACCCGCCGCCACCCGCCGCCACCCGCCGCCACCCGCCGCC
 G = Graph()
 G.load_data_file("dna.txt")
-print(G)
+path = G.shortest_cycle_path()
+
+dna = ""
+for element in path:
+    dna += element[0]
+
+print(dna)
