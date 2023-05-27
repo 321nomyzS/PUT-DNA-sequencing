@@ -32,63 +32,84 @@ class Graph:
         return f"{element}-{element_count}"
 
     def _generate_graph(self):
+        j = 0
         vertex_list = list(self.incident_list.keys())
 
         for i in range(len(vertex_list)):
+            main_loop_label = "main_loop"
             for j in range(len(vertex_list)):
                 vertex_label_1 = vertex_list[i].split('-')[0]
                 vertex_label_2 = vertex_list[j].split('-')[0]
 
-                if vertex_label_1 == vertex_label_2:
+                if i == j:
                     continue
+                self.incident_list[vertex_list[i]].append((vertex_list[j], len(vertex_label_1)))
 
                 for k in range(len(vertex_label_1)-1, 0, -1):
                     if vertex_label_1[-k:] == vertex_label_2[:k]:
                         self.incident_list[vertex_list[i]].append((vertex_list[j], len(vertex_label_1)-k))
+                        j = len(vertex_list)
+                        break
 
-    def shortest_cycle_path(self):
+        for vertex in vertex_list:
+            self.incident_list[vertex] = sorted(self.incident_list[vertex], key=lambda x: x[1])
+
+    def shortest_cycle_path(self, n, l):
         import random
-        n = len(self.incident_list)
         visited = []
         best_path = []
+        start_vertexes = list(self.incident_list.keys())
 
         def dfs(current, length, path):
             nonlocal best_path
 
             visited.append(current)
             path.append(current)
-
-            if len(path) == n:
-                # jeśli odwiedziliśmy wszystkie wierzchołki, to dodajemy koszt podróży powrotnej do kosztu
-                length += self.incident_list[current][0][1]
+            if length == n-l and len(path) > len(best_path):
                 best_path = path.copy()
 
-            elif not best_path:
-                min_cost = float("inf")
-                min_neighbor = None
-                for neighbor, cost in self.incident_list[current]:
-                    if neighbor not in visited and cost < min_cost:
-                        min_cost = cost
-                        min_neighbor = neighbor
-                if min_neighbor:
-                    dfs(min_neighbor, length + min_cost, path)
+            else:
+                for vertex, cost in self.incident_list[current]:
+                    if vertex not in visited:
+                        dfs(vertex, length+cost, path)
 
             visited.remove(current)
             path.pop()
 
-        while best_path is None or best_path == []:
-            start = random.choice(list(self.incident_list.keys()))
+        while len(start_vertexes) != 0:
+            start = random.choice(start_vertexes)
+            start_vertexes.remove(start)
             dfs(start, 0, [])
         return best_path
 
+    def random_data_generator(self, n, l, positive=0, negative=0):
+        import random
+        alphabet = ['A', 'C', 'G', 'T']
+        random_dna = ""
+        sequences = []
 
-# Expected output: ACCCGCCGCCACCCGCCGCCACCCGCCGCCACCCGCCGCC
-G = Graph()
-G.load_data_file("dna.txt")
-path = G.shortest_cycle_path()
+        for _ in range(n):
+            random_dna += random.choice(alphabet)
 
-dna = ""
-for element in path:
-    dna += element[0]
+        for i in range(len(random_dna)-l+1):
+            sequences.append(random_dna[i:i+l])
 
-print(dna)
+        random.shuffle(sequences)
+        sequences = sequences[negative:]
+
+        for _ in range(positive):
+            random_seq = ""
+            for _ in range(l):
+                random_seq += random.choice(alphabet)
+            sequences.append(random_seq)
+
+        random.shuffle(sequences)
+        self.load_data(sequences)
+
+        return random_dna
+
+    def calculate_errors(self, n, l, best_path):
+        negative = (n - l + 1) - len(best_path)
+        positive = len(self.incident_list.keys()) - len(best_path)
+
+        return positive, negative
